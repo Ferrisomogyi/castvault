@@ -559,3 +559,6 @@ document.addEventListener('visibilitychange', () => {
     toast('Database kan niet openen', 'error');
   }
 })();
+document.getElementById('btn-new').addEventListener('click', () => {
+  toast('Handmatig contact toevoegen komt in v0.2', '');
+});
