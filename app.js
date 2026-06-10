@@ -562,3 +562,5 @@ document.addEventListener('visibilitychange', () => {
 document.getElementById('btn-new').addEventListener('click', () => {
   toast('Handmatig contact toevoegen komt in v0.2', '');
 });
+window.openModal = openModal;
+window.closeModal = closeModal;
