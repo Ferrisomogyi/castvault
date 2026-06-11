@@ -1,5 +1,5 @@
 /* ============================================================
-   CastVault v0.5.1
+   CastVault v0.5.2
    Chat 1 (v0.1): crypto, IndexedDB, vCard import, fuzzy search.
    Chat 2 (v0.2): detail-scherm + tabs, edit-modus per tab,
                   handmatig nieuw contact, tags + autocomplete,
@@ -25,7 +25,7 @@ const SALT_LEN = 16;
 const IV_LEN = 12;
 
 /* AI-proxy: Cloudflare Worker (API-key staat ALLEEN daar, nooit in de client) */
-const WORKER_URL = 'https://actingtool.ferencsomogyi.workers.dev';
+const WORKER_URL = 'https://castvault.ferencsomogyi.workers.dev';
 
 const enc = new TextEncoder();
 const dec = new TextDecoder();
