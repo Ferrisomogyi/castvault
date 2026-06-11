@@ -1,10 +1,12 @@
 /* CastVault Service Worker — offline-first cache */
-const CACHE = 'castvault-v0.1';
+const CACHE = 'castvault-v0.5';
 const ASSETS = [
   './',
   './index.html',
   './app.js',
   './manifest.json',
+  './icon-192.png',
+  './icon-512.png',
 ];
 
 self.addEventListener('install', e => {
@@ -23,7 +25,6 @@ self.addEventListener('activate', e => {
 
 self.addEventListener('fetch', e => {
   const url = new URL(e.request.url);
-  // Only cache same-origin GET requests. Pass-through everything else (Google Fonts, future API calls).
   if (e.request.method !== 'GET') return;
   if (url.origin !== location.origin) return;
 

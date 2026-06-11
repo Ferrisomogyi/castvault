@@ -3,19 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self';">
-<meta name="theme-color" content="#0a1628">
-  <meta name="mobile-web-app-capable" content="yes">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://nl.wikipedia.org https://en.wikipedia.org https://actingtool.ferencsomogyi.workers.dev;">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="CastVault">
-<link rel="manifest" href="manifest.json">
-<link rel="icon" href="icon-192.png" type="image/png">
-<link rel="apple-touch-icon" href="icon-192.png">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="CastVault">
+<meta name="theme-color" content="#0a1628">
 <title>CastVault</title>
 <link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png" type="image/png">
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -44,6 +40,9 @@
     --shadow-2: 0 12px 40px rgba(0, 0, 0, 0.5);
     --font-display: 'Cormorant Garamond', Georgia, serif;
     --font-body: 'Inter', -apple-system, system-ui, sans-serif;
+    /* Tag palette (8) — tuned to dark premium theme */
+    --tag-1: #c9a961; --tag-2: #6db58b; --tag-3: #5b9bd5; --tag-4: #b57edc;
+    --tag-5: #d4884e; --tag-6: #d4574e; --tag-7: #4ec9c9; --tag-8: #9aa7b8;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
@@ -79,17 +78,9 @@
   }
   .screen.active { display: flex; }
 
-  /* ========== LOCK / SETUP SCREENS ========== */
-  .auth {
-    align-items: center;
-    justify-content: center;
-    padding: 32px 24px;
-  }
-  .auth-inner {
-    width: 100%;
-    max-width: 380px;
-    text-align: center;
-  }
+  /* ========== AUTH SCREENS ========== */
+  .auth { align-items: center; justify-content: center; padding: 32px 24px; }
+  .auth-inner { width: 100%; max-width: 380px; text-align: center; }
   .logo {
     font-family: var(--font-display);
     font-size: 56px;
@@ -100,11 +91,7 @@
     position: relative;
     display: inline-block;
   }
-  .logo .vault {
-    color: var(--gold);
-    font-style: italic;
-    font-weight: 400;
-  }
+  .logo .vault { color: var(--gold); font-style: italic; font-weight: 400; }
   .logo::after {
     content: "";
     display: block;
@@ -133,15 +120,8 @@
     font-size: 16px;
     transition: border-color 0.2s, box-shadow 0.2s;
   }
-  .input-field:focus {
-    outline: none;
-    border-color: var(--gold);
-    box-shadow: 0 0 0 3px var(--gold-soft);
-  }
-  .input-field.error {
-    border-color: var(--danger);
-    animation: shake 0.4s;
-  }
+  .input-field:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px var(--gold-soft); }
+  .input-field.error { border-color: var(--danger); animation: shake 0.4s; }
   @keyframes shake {
     0%, 100% { transform: translateX(0); }
     25% { transform: translateX(-6px); }
@@ -165,55 +145,18 @@
   }
   .btn-primary:hover { box-shadow: 0 6px 24px rgba(201, 169, 97, 0.35); }
   .btn-primary:active { transform: translateY(1px); }
-  .btn-primary:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-    box-shadow: none;
-  }
-  .btn-secondary {
-    background: transparent;
-    border: 1px solid var(--line);
-    color: var(--text);
-  }
-  .btn-secondary:hover { border-color: var(--gold); }
-  .auth-msg {
-    margin-top: 16px;
-    font-size: 13px;
-    color: var(--text-dim);
-    min-height: 18px;
-  }
+  .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; }
+  .btn-secondary { background: transparent; border: 1px solid var(--line); color: var(--text); box-shadow:none; }
+  .btn-secondary:hover { border-color: var(--gold); box-shadow:none; }
+  .btn-danger { background: linear-gradient(180deg, #e0695f, var(--danger)); color: #fff; box-shadow:none; }
+  .auth-msg { margin-top: 16px; font-size: 13px; color: var(--text-dim); min-height: 18px; }
   .auth-msg.error { color: var(--danger); }
   .auth-msg.success { color: var(--success); }
-  .strength-meter {
-    height: 4px;
-    background: var(--bg-input);
-    border-radius: 2px;
-    margin-top: 8px;
-    overflow: hidden;
-  }
-  .strength-bar {
-    height: 100%;
-    width: 0%;
-    transition: width 0.3s, background 0.3s;
-    background: var(--danger);
-  }
-  .strength-label {
-    font-size: 12px;
-    color: var(--text-dim);
-    margin-top: 6px;
-    text-align: right;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-  }
+  .strength-meter { height: 4px; background: var(--bg-input); border-radius: 2px; margin-top: 8px; overflow: hidden; }
+  .strength-bar { height: 100%; width: 0%; transition: width 0.3s, background 0.3s; background: var(--danger); }
+  .strength-label { font-size: 12px; color: var(--text-dim); margin-top: 6px; text-align: right; text-transform: uppercase; letter-spacing: 0.08em; }
   .field-group { text-align: left; margin-bottom: 16px; }
-  .field-label {
-    display: block;
-    font-size: 12px;
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-    color: var(--text-dim);
-    margin-bottom: 8px;
-  }
+  .field-label { display: block; font-size: 12px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text-dim); margin-bottom: 8px; }
 
   /* ========== MAIN APP ========== */
   .topbar {
@@ -227,12 +170,7 @@
     align-items: center;
     gap: 12px;
   }
-  .topbar-title {
-    font-family: var(--font-display);
-    font-size: 24px;
-    font-weight: 500;
-    letter-spacing: -0.01em;
-  }
+  .topbar-title { font-family: var(--font-display); font-size: 24px; font-weight: 500; letter-spacing: -0.01em; }
   .topbar-title .vault { color: var(--gold); font-style: italic; }
   .topbar-spacer { flex: 1; }
   .icon-btn {
@@ -244,17 +182,25 @@
     display: flex; align-items: center; justify-content: center;
     cursor: pointer;
     transition: border-color 0.2s, color 0.2s;
+    position: relative;
   }
   .icon-btn:hover { border-color: var(--gold); color: var(--gold); }
   .icon-btn svg { width: 18px; height: 18px; }
+  .icon-btn .badge {
+    position: absolute; top: -6px; right: -6px;
+    background: var(--gold); color: var(--bg-deep);
+    font-size: 10px; font-weight: 700;
+    min-width: 16px; height: 16px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    padding: 0 4px;
+  }
 
-  .search-bar {
-    padding: 16px 20px 8px;
-    flex-shrink: 0;
-  }
-  .search-input-wrap {
-    position: relative;
-  }
+  /* main body becomes a 2-column grid on desktop for the sidebar filters */
+  .main-body { flex: 1; display: flex; min-height: 0; }
+  .main-col { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+
+  .search-bar { padding: 16px 20px 8px; flex-shrink: 0; display:flex; gap:10px; align-items:center; }
+  .search-input-wrap { position: relative; flex:1; }
   .search-input {
     width: 100%;
     background: var(--bg-card);
@@ -265,36 +211,14 @@
     font-family: var(--font-body);
     font-size: 15px;
   }
-  .search-input:focus {
-    outline: none;
-    border-color: var(--gold);
-  }
-  .search-icon {
-    position: absolute;
-    left: 14px; top: 50%;
-    transform: translateY(-50%);
-    color: var(--text-dim);
-    pointer-events: none;
-  }
+  .search-input:focus { outline: none; border-color: var(--gold); }
+  .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-dim); pointer-events: none; }
 
-  .stats {
-    padding: 4px 20px 16px;
-    flex-shrink: 0;
-    display: flex;
-    gap: 8px;
-    font-size: 12px;
-    color: var(--text-dim);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-  }
+  .stats { padding: 4px 20px 16px; flex-shrink: 0; display: flex; gap: 14px; font-size: 12px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.1em; align-items:center; }
   .stats strong { color: var(--gold); font-weight: 600; }
+  .stats .clear-filters { margin-left:auto; color: var(--gold); cursor:pointer; text-transform:none; letter-spacing:0; border-bottom:1px dashed var(--gold); }
 
-  .contact-list {
-    flex: 1;
-    overflow-y: auto;
-    padding: 0 20px 20px;
-    -webkit-overflow-scrolling: touch;
-  }
+  .contact-list { flex: 1; overflow-y: auto; padding: 0 20px 100px; -webkit-overflow-scrolling: touch; }
   .contact-card {
     background: var(--bg-card);
     border: 1px solid var(--line-soft);
@@ -322,56 +246,28 @@
     flex-shrink: 0;
   }
   .contact-meta { flex: 1; min-width: 0; }
-  .contact-name {
-    font-weight: 500;
-    font-size: 15px;
-    color: var(--text);
-    overflow: hidden;
-    text-overflow: ellipsis;
+  .contact-name { font-weight: 500; font-size: 15px; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .contact-sub { font-size: 13px; color: var(--text-dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-top: 2px; }
+  .card-tags { display:flex; gap:5px; margin-top:6px; flex-wrap:wrap; }
+  .red-flag-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--danger); box-shadow: 0 0 8px var(--danger); flex-shrink: 0; }
+
+  /* tag chips */
+  .tag-chip {
+    display:inline-flex; align-items:center; gap:5px;
+    font-size: 11px; font-weight: 600; letter-spacing:0.02em;
+    padding: 3px 9px; border-radius: 20px;
+    border: 1px solid currentColor;
+    background: color-mix(in srgb, currentColor 14%, transparent);
     white-space: nowrap;
   }
-  .contact-sub {
-    font-size: 13px;
-    color: var(--text-dim);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    margin-top: 2px;
-  }
-  .red-flag-dot {
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    background: var(--danger);
-    box-shadow: 0 0 8px var(--danger);
-    flex-shrink: 0;
-  }
+  .tag-chip .x { cursor:pointer; opacity:0.7; font-weight:400; }
+  .tag-chip .x:hover { opacity:1; }
 
-  .empty-state {
-    text-align: center;
-    padding: 64px 32px;
-    color: var(--text-dim);
-  }
-  .empty-state-icon {
-    font-family: var(--font-display);
-    font-style: italic;
-    font-size: 80px;
-    color: var(--gold);
-    opacity: 0.3;
-    margin-bottom: 16px;
-  }
-  .empty-state-title {
-    font-family: var(--font-display);
-    font-size: 24px;
-    color: var(--text);
-    margin-bottom: 8px;
-  }
-  .empty-state-text {
-    font-size: 14px;
-    margin-bottom: 24px;
-    line-height: 1.6;
-  }
+  .empty-state { text-align: center; padding: 64px 32px; color: var(--text-dim); }
+  .empty-state-icon { font-family: var(--font-display); font-style: italic; font-size: 80px; color: var(--gold); opacity: 0.3; margin-bottom: 16px; }
+  .empty-state-title { font-family: var(--font-display); font-size: 24px; color: var(--text); margin-bottom: 8px; }
+  .empty-state-text { font-size: 14px; margin-bottom: 24px; line-height: 1.6; }
 
-  /* ========== FAB ========== */
   .fab {
     position: fixed;
     bottom: calc(20px + env(safe-area-inset-bottom));
@@ -390,7 +286,7 @@
   .fab:active { transform: scale(0.93); }
   .fab svg { width: 24px; height: 24px; }
 
-  /* ========== MODAL ========== */
+  /* ========== MODALS / SHEETS ========== */
   .modal-backdrop {
     position: fixed; inset: 0;
     background: rgba(5, 12, 22, 0.7);
@@ -417,23 +313,9 @@
     from { transform: translateY(100%); }
     to { transform: translateY(0); }
   }
-  .modal-handle {
-    width: 36px; height: 4px;
-    background: var(--line);
-    border-radius: 2px;
-    margin: -8px auto 16px;
-  }
-  .modal-title {
-    font-family: var(--font-display);
-    font-size: 26px;
-    font-weight: 500;
-    margin-bottom: 4px;
-  }
-  .modal-subtitle {
-    font-size: 13px;
-    color: var(--text-dim);
-    margin-bottom: 24px;
-  }
+  .modal-handle { width: 36px; height: 4px; background: var(--line); border-radius: 2px; margin: -8px auto 16px; }
+  .modal-title { font-family: var(--font-display); font-size: 26px; font-weight: 500; margin-bottom: 4px; }
+  .modal-subtitle { font-size: 13px; color: var(--text-dim); margin-bottom: 24px; }
 
   .file-drop {
     border: 2px dashed var(--line);
@@ -444,23 +326,10 @@
     transition: border-color 0.2s, background 0.2s;
     margin-bottom: 16px;
   }
-  .file-drop:hover, .file-drop.dragover {
-    border-color: var(--gold);
-    background: var(--gold-soft);
-  }
-  .file-drop-text {
-    font-family: var(--font-display);
-    font-style: italic;
-    font-size: 18px;
-    color: var(--text-soft);
-  }
-  .file-drop-hint {
-    font-size: 12px;
-    color: var(--text-dim);
-    margin-top: 6px;
-  }
+  .file-drop:hover, .file-drop.dragover { border-color: var(--gold); background: var(--gold-soft); }
+  .file-drop-text { font-family: var(--font-display); font-style: italic; font-size: 18px; color: var(--text-soft); }
+  .file-drop-hint { font-size: 12px; color: var(--text-dim); margin-top: 6px; }
 
-  /* ========== TOAST ========== */
   .toast {
     position: fixed;
     top: calc(20px + env(safe-area-inset-top));
@@ -475,120 +344,569 @@
     z-index: 100;
     transition: transform 0.3s;
     box-shadow: var(--shadow-2);
+    max-width: 90vw; text-align:center;
   }
   .toast.show { transform: translateX(-50%) translateY(0); }
   .toast.success { border-color: var(--success); }
   .toast.error { border-color: var(--danger); }
 
-  /* ========== SCROLLBAR ========== */
-  .contact-list::-webkit-scrollbar { width: 4px; }
-  .contact-list::-webkit-scrollbar-track { background: transparent; }
-  .contact-list::-webkit-scrollbar-thumb { background: var(--line); border-radius: 2px; }
+  .contact-list::-webkit-scrollbar, .detail-body::-webkit-scrollbar, .filter-panel::-webkit-scrollbar { width: 4px; }
+  .contact-list::-webkit-scrollbar-thumb, .detail-body::-webkit-scrollbar-thumb, .filter-panel::-webkit-scrollbar-thumb { background: var(--line); border-radius: 2px; }
 
-  /* iPad / desktop */
+  /* ========== DETAIL SCREEN ========== */
+  .detail-top {
+    flex-shrink:0;
+    background: rgba(10,22,40,0.85);
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--line-soft);
+    padding: 12px 16px;
+    display:flex; align-items:center; gap:10px;
+  }
+  .back-btn {
+    background:transparent; border:none; color:var(--gold);
+    display:flex; align-items:center; gap:6px; cursor:pointer;
+    font-family:var(--font-body); font-size:15px; padding:6px 4px;
+  }
+  .back-btn svg { width:18px; height:18px; }
+  .detail-hero { padding: 20px; display:flex; align-items:center; gap:16px; flex-shrink:0; }
+  .avatar-lg { width:64px; height:64px; font-size:26px; }
+  .detail-hero-meta { min-width:0; flex:1; }
+  .detail-hero-name { font-family:var(--font-display); font-size:28px; font-weight:500; line-height:1.1; }
+  .detail-hero-sub { font-size:13px; color:var(--text-dim); margin-top:4px; }
+  .detail-hero-tags { display:flex; gap:5px; flex-wrap:wrap; margin-top:8px; }
+
+  .tabbar {
+    flex-shrink:0; display:flex; gap:4px; padding: 0 14px;
+    overflow-x:auto; border-bottom:1px solid var(--line-soft);
+    scrollbar-width:none;
+  }
+  .tabbar::-webkit-scrollbar { display:none; }
+  .tab {
+    background:transparent; border:none; cursor:pointer;
+    color:var(--text-dim); font-family:var(--font-body); font-size:13px; font-weight:500;
+    padding: 12px 12px 14px; white-space:nowrap; position:relative;
+    transition: color 0.2s;
+  }
+  .tab.active { color: var(--gold); }
+  .tab.active::after {
+    content:""; position:absolute; left:8px; right:8px; bottom:-1px; height:2px;
+    background: var(--gold); border-radius:2px;
+  }
+  .tab .tab-dot { display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--danger); margin-left:5px; vertical-align:middle; }
+
+  .detail-body { flex:1; overflow-y:auto; padding: 18px 20px 120px; -webkit-overflow-scrolling:touch; }
+
+  .tab-head { display:flex; align-items:center; margin-bottom:16px; }
+  .tab-head h3 { font-family:var(--font-display); font-size:22px; font-weight:500; flex:1; }
+  .edit-toggle {
+    background:transparent; border:1px solid var(--line); color:var(--gold);
+    border-radius: var(--radius-sm); padding:7px 14px; cursor:pointer;
+    font-family:var(--font-body); font-size:13px; font-weight:600;
+    display:inline-flex; align-items:center; gap:6px; transition:border-color .2s;
+  }
+  .edit-toggle:hover { border-color:var(--gold); }
+  .edit-toggle svg { width:14px; height:14px; }
+
+  /* read-only field rows */
+  .field-row { display:flex; padding: 11px 0; border-bottom:1px solid var(--line-soft); gap:14px; }
+  .field-row:last-child { border-bottom:none; }
+  .field-row .fr-label { width:130px; flex-shrink:0; font-size:12px; text-transform:uppercase; letter-spacing:0.08em; color:var(--text-dim); padding-top:2px; }
+  .field-row .fr-value { flex:1; min-width:0; color:var(--text); word-break:break-word; }
+  .field-row .fr-value.empty { color:var(--text-dim); font-style:italic; }
+  .fr-value a { color: var(--gold); text-decoration:none; }
+  .fr-pill { display:inline-block; background:var(--bg-input); border:1px solid var(--line-soft); border-radius:20px; padding:2px 10px; font-size:12px; margin:0 4px 4px 0; }
+
+  .section-sub { font-size:12px; text-transform:uppercase; letter-spacing:0.1em; color:var(--gold); margin: 22px 0 8px; font-weight:600; }
+  .placeholder-note {
+    background: var(--bg-input); border:1px dashed var(--line);
+    border-radius: var(--radius-sm); padding:14px 16px; font-size:13px; color:var(--text-dim);
+    line-height:1.6; margin-top:8px;
+  }
+
+  /* edit inputs */
+  .edit-field { margin-bottom:14px; }
+  .edit-field label { display:block; font-size:12px; text-transform:uppercase; letter-spacing:0.08em; color:var(--text-dim); margin-bottom:6px; }
+  .edit-field input, .edit-field select, .edit-field textarea {
+    width:100%; background:var(--bg-input); border:1px solid var(--line);
+    border-radius:var(--radius-sm); padding:11px 13px; color:var(--text);
+    font-family:var(--font-body); font-size:15px;
+  }
+  .edit-field input:focus, .edit-field select:focus, .edit-field textarea:focus { outline:none; border-color:var(--gold); box-shadow:0 0 0 3px var(--gold-soft); }
+  .edit-field textarea { resize:vertical; min-height:70px; }
+  .edit-field .hint { font-size:11px; color:var(--text-dim); margin-top:5px; }
+  .edit-row-2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .edit-row-3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; }
+
+  /* multi-entry (telefoon/email) */
+  .multi-entry { display:flex; gap:8px; margin-bottom:8px; align-items:center; }
+  .multi-entry input { flex:1; }
+  .multi-entry .lbl { width:90px; flex-shrink:0; }
+  .mini-btn { background:var(--bg-elev); border:1px solid var(--line); color:var(--text-soft); width:36px; height:38px; border-radius:var(--radius-sm); cursor:pointer; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:18px; }
+  .mini-btn:hover { border-color:var(--gold); color:var(--gold); }
+  .add-line { background:transparent; border:1px dashed var(--line); color:var(--text-soft); border-radius:var(--radius-sm); padding:9px; width:100%; cursor:pointer; font-family:var(--font-body); font-size:13px; margin-top:4px; }
+  .add-line:hover { border-color:var(--gold); color:var(--gold); }
+
+  /* sliders */
+  .slider-field { margin-bottom:18px; }
+  .slider-field .slider-top { display:flex; justify-content:space-between; font-size:12px; text-transform:uppercase; letter-spacing:0.08em; color:var(--text-dim); margin-bottom:8px; }
+  .slider-field .slider-val { color:var(--gold); font-weight:700; }
+  input[type=range] { width:100%; -webkit-appearance:none; appearance:none; height:4px; background:var(--line); border-radius:2px; outline:none; }
+  input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; appearance:none; width:20px; height:20px; border-radius:50%; background:linear-gradient(180deg,var(--gold-bright),var(--gold)); cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,.4); }
+  input[type=range]::-moz-range-thumb { width:20px; height:20px; border:none; border-radius:50%; background:var(--gold); cursor:pointer; }
+
+  /* toggle */
+  .toggle-field { display:flex; align-items:center; justify-content:space-between; padding:11px 0; border-bottom:1px solid var(--line-soft); }
+  .toggle-field span { font-size:14px; }
+  .toggle { position:relative; width:46px; height:26px; flex-shrink:0; }
+  .toggle input { opacity:0; width:0; height:0; }
+  .toggle .track { position:absolute; inset:0; background:var(--bg-input); border:1px solid var(--line); border-radius:20px; transition:.2s; cursor:pointer; }
+  .toggle .track::before { content:""; position:absolute; width:18px; height:18px; left:3px; top:3px; background:var(--text-dim); border-radius:50%; transition:.2s; }
+  .toggle input:checked + .track { background:var(--gold-soft); border-color:var(--gold); }
+  .toggle input:checked + .track::before { transform:translateX(20px); background:var(--gold); }
+
+  .edit-actions { display:flex; gap:10px; margin-top:24px; position:sticky; bottom:0; background:linear-gradient(transparent, var(--bg-deep) 30%); padding:12px 0 4px; }
+  .edit-actions button { margin-top:0; }
+
+  /* tags editor */
+  .tag-editor { position:relative; }
+  .tag-input-wrap { display:flex; flex-wrap:wrap; gap:6px; padding:8px; background:var(--bg-input); border:1px solid var(--line); border-radius:var(--radius-sm); min-height:46px; align-items:center; }
+  .tag-input-wrap input { flex:1; min-width:100px; background:transparent; border:none; color:var(--text); font-family:var(--font-body); font-size:15px; outline:none; padding:4px; }
+  .autocomplete { position:absolute; left:0; right:0; top:100%; margin-top:4px; background:var(--bg-elev); border:1px solid var(--line); border-radius:var(--radius-sm); z-index:20; max-height:180px; overflow-y:auto; box-shadow:var(--shadow-2); display:none; }
+  .autocomplete.show { display:block; }
+  .autocomplete .ac-item { padding:9px 12px; cursor:pointer; display:flex; align-items:center; gap:8px; font-size:14px; }
+  .autocomplete .ac-item:hover, .autocomplete .ac-item.active { background:var(--gold-soft); }
+  .color-dot { width:12px; height:12px; border-radius:50%; flex-shrink:0; border:1px solid rgba(255,255,255,.2); }
+  .palette { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+  .palette .swatch { width:28px; height:28px; border-radius:50%; cursor:pointer; border:2px solid transparent; transition:transform .1s; }
+  .palette .swatch:hover { transform:scale(1.1); }
+  .palette .swatch.sel { border-color:var(--text); }
+
+  /* red flags */
+  .flag-card { background:var(--bg-input); border:1px solid var(--line); border-left-width:4px; border-radius:var(--radius-sm); padding:13px 15px; margin-bottom:12px; }
+  .flag-card.rood { border-left-color:var(--danger); }
+  .flag-card.oranje { border-left-color:var(--warn); }
+  .flag-card.groen { border-left-color:var(--success); }
+  .flag-head { display:flex; align-items:center; gap:8px; margin-bottom:6px; }
+  .flag-badge { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; padding:2px 8px; border-radius:4px; }
+  .flag-badge.rood { background:rgba(212,87,78,.18); color:var(--danger); }
+  .flag-badge.oranje { background:rgba(212,161,78,.18); color:var(--warn); }
+  .flag-badge.groen { background:rgba(109,181,139,.18); color:var(--success); }
+  .flag-motiv { font-size:14px; margin:4px 0 8px; }
+  .flag-meta { font-size:11px; color:var(--text-dim); display:flex; gap:14px; flex-wrap:wrap; }
+  .flag-del { margin-left:auto; color:var(--text-dim); cursor:pointer; font-size:12px; }
+  .flag-del:hover { color:var(--danger); }
+  .flag-color-pick { display:flex; gap:10px; margin:6px 0 14px; }
+  .flag-color-pick label { flex:1; text-align:center; padding:10px; border:1px solid var(--line); border-radius:var(--radius-sm); cursor:pointer; font-size:13px; font-weight:600; }
+  .flag-color-pick input { display:none; }
+  .flag-color-pick input:checked + .fcp-rood { border-color:var(--danger); background:rgba(212,87,78,.14); color:var(--danger); }
+  .flag-color-pick input:checked + .fcp-oranje { border-color:var(--warn); background:rgba(212,161,78,.14); color:var(--warn); }
+  .flag-color-pick input:checked + .fcp-groen { border-color:var(--success); background:rgba(109,181,139,.14); color:var(--success); }
+
+  /* notities & audit */
+  .note-card { background:var(--bg-input); border:1px solid var(--line-soft); border-radius:var(--radius-sm); padding:12px 14px; margin-bottom:10px; }
+  .note-date { font-size:11px; color:var(--text-dim); margin-bottom:5px; }
+  .note-text { font-size:14px; white-space:pre-wrap; word-break:break-word; }
+  .note-del { float:right; color:var(--text-dim); cursor:pointer; font-size:12px; }
+  .note-del:hover { color:var(--danger); }
+  .audit-row { display:flex; gap:10px; font-size:12px; padding:9px 0; border-bottom:1px solid var(--line-soft); color:var(--text-soft); }
+  .audit-row .ad-date { color:var(--text-dim); width:120px; flex-shrink:0; }
+  .audit-row .ad-act { flex:1; }
+  .audit-row .ad-act strong { color:var(--gold); font-weight:600; }
+
+  /* ========== FILTER PANEL (sheet on mobile, sidebar on desktop) ========== */
+  .filter-panel { display:flex; flex-direction:column; }
+  .filter-head { display:flex; align-items:center; margin-bottom:6px; }
+  .filter-head h3 { font-family:var(--font-display); font-size:22px; font-weight:500; flex:1; }
+  .filter-block { margin: 16px 0; }
+  .filter-block > .fb-label { font-size:12px; text-transform:uppercase; letter-spacing:0.1em; color:var(--gold); margin-bottom:10px; font-weight:600; }
+  .chip-select { display:flex; flex-wrap:wrap; gap:8px; }
+  .chip-opt { background:var(--bg-input); border:1px solid var(--line); border-radius:20px; padding:7px 13px; font-size:13px; cursor:pointer; transition:.15s; }
+  .chip-opt:hover { border-color:var(--gold); }
+  .chip-opt.sel { background:var(--gold-soft); border-color:var(--gold); color:var(--gold-bright); }
+  .range-row { display:flex; gap:12px; align-items:center; }
+  .range-row input { width:70px; text-align:center; background:var(--bg-input); border:1px solid var(--line); border-radius:var(--radius-sm); padding:9px; color:var(--text); font-family:var(--font-body); }
+  .range-row span { color:var(--text-dim); }
+
+  /* desktop sidebar */
+  .filter-sidebar { display:none; }
+  @media (min-width: 900px) {
+    .filter-sidebar {
+      display:flex; width:300px; flex-shrink:0;
+      border-right:1px solid var(--line-soft);
+      flex-direction:column; overflow-y:auto;
+      padding: 18px 20px 40px;
+    }
+    .filter-sidebar .filter-head h3 { font-size:20px; }
+    .btn-filter-mobile { display:none !important; }
+  }
+
+  /* ========== v0.3: BIO / TV / REVIEW / SYNC ========== */
+  .bio-text { font-size:14px; line-height:1.7; white-space:pre-wrap; }
+  .bio-meta { font-size:11px; color:var(--text-dim); margin-top:8px; word-break:break-word; }
+  .empty-inline { color:var(--text-dim); font-style:italic; font-size:14px; margin:4px 0 10px; }
+  .btn-inline {
+    background:transparent; border:1px solid var(--line); color:var(--gold);
+    border-radius:var(--radius-sm); padding:9px 14px; cursor:pointer;
+    font-family:var(--font-body); font-size:13px; font-weight:600; margin:10px 0 4px;
+    transition:border-color .2s;
+  }
+  .btn-inline:hover { border-color:var(--gold); }
+  .tv-card { display:flex; align-items:center; gap:10px; background:var(--bg-input); border:1px solid var(--line-soft); border-radius:var(--radius-sm); padding:11px 13px; margin-bottom:8px; }
+  .tv-card .tv-main { flex:1; min-width:0; font-size:14px; }
+  .tv-card .tv-jaar { color:var(--text-dim); font-weight:400; }
+  .tv-card .tv-sub { font-size:12px; color:var(--text-dim); margin-top:2px; }
+  .tv-badge { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; padding:2px 7px; border-radius:4px; white-space:nowrap; flex-shrink:0; }
+  .tv-badge.ok { background:rgba(109,181,139,.18); color:var(--success); }
+  .tv-badge.unv { background:rgba(212,161,78,.18); color:var(--warn); }
+  .tv-badge.dup { background:var(--bg-elev); color:var(--text-dim); }
+  .tv-verify { background:transparent; border:1px solid var(--line); color:var(--success); border-radius:4px; padding:3px 8px; font-size:11px; cursor:pointer; flex-shrink:0; }
+  .tv-verify:hover { border-color:var(--success); }
+  .tv-edit-row { display:grid; grid-template-columns:1.4fr .55fr 1fr .8fr 36px; gap:6px; margin-bottom:8px; }
+  .tv-edit-row input { background:var(--bg-input); border:1px solid var(--line); border-radius:var(--radius-sm); padding:9px 10px; color:var(--text); font-family:var(--font-body); font-size:13px; min-width:0; }
+  .tv-edit-row input:focus { outline:none; border-color:var(--gold); }
+  .review-list { max-height:40vh; overflow-y:auto; margin-bottom:8px; }
+  .review-item { display:flex; align-items:center; gap:10px; padding:10px 8px; border-bottom:1px solid var(--line-soft); cursor:pointer; }
+  .review-item input[type=checkbox] { accent-color:var(--gold); width:17px; height:17px; flex-shrink:0; }
+  .review-item .ri-main { flex:1; min-width:0; font-size:14px; }
+  .review-item .ri-sub { display:block; font-size:12px; color:var(--text-dim); }
+  .review-item.dup { opacity:.55; }
+  .review-warn { background:rgba(212,161,78,.12); border:1px solid var(--warn); color:var(--warn); border-radius:var(--radius-sm); padding:10px 12px; font-size:13px; margin-bottom:12px; }
+  .imp-mode { display:flex; flex-direction:column; gap:8px; margin:4px 0 14px; font-size:14px; color:var(--text-soft); }
+  .imp-mode label { display:flex; align-items:center; gap:8px; cursor:pointer; }
+  .imp-mode input { accent-color:var(--gold); }
+
+  /* ========== v0.4: FOTO / DOSSIER / AUDITLOG / DELETE / BIO ========== */
+  .avatar { overflow:hidden; position:relative; }
+  .avatar img { width:100%; height:100%; object-fit:cover; display:block; }
+  .avatar-lg { overflow:visible; }
+  .avatar-lg img { border-radius:50%; }
+  .avatar-cam {
+    position:absolute; right:-4px; bottom:-4px; width:24px; height:24px;
+    border-radius:50%; border:1px solid var(--line);
+    background:var(--bg-elev); color:var(--gold); font-size:15px; line-height:1;
+    cursor:pointer; display:flex; align-items:center; justify-content:center;
+    box-shadow:var(--shadow-1); z-index:2;
+  }
+  .avatar-cam:hover { border-color:var(--gold); }
+  .foto-preview { display:flex; align-items:center; justify-content:center; min-height:180px; background:var(--bg-input); border:1px solid var(--line-soft); border-radius:var(--radius); margin-bottom:14px; overflow:hidden; }
+  .foto-preview img { max-width:100%; max-height:320px; display:block; }
+  .foto-empty { color:var(--text-dim); font-style:italic; text-align:center; padding:24px; line-height:1.7; }
+  .al-filters { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px; }
+  .al-filters select, .al-filters input { width:100%; background:var(--bg-input); border:1px solid var(--line); border-radius:var(--radius-sm); padding:9px 11px; color:var(--text); font-family:var(--font-body); font-size:13px; }
+  .al-filters .full { grid-column:1 / -1; }
+  .al-count { font-size:11px; color:var(--text-dim); text-transform:uppercase; letter-spacing:.08em; margin-bottom:6px; }
+  .al-rows { max-height:45vh; overflow-y:auto; border-top:1px solid var(--line-soft); }
+
+  /* ========== v0.5: BEWAARTERMIJN (AVG retentie-signalering) ========== */
+  .icon-btn .badge.badge-ret { background: var(--danger, #e05555); color: #fff; }
+  .ret-setting { display:flex; align-items:center; gap:8px; margin-bottom:14px; font-size:13px; color:var(--text-soft); flex-wrap:wrap; }
+  .ret-setting input { width:70px; background:var(--bg-input); border:1px solid var(--line); border-radius:var(--radius-sm); padding:8px 10px; color:var(--text); font-family:var(--font-body); font-size:14px; text-align:center; }
+  .ret-row { display:flex; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid var(--line-soft); font-size:13px; }
+  .ret-row .ret-meta { flex:1; min-width:0; }
+  .ret-row .ret-naam { color:var(--gold); font-weight:600; }
+  .ret-row .ret-sub { color:var(--text-dim); font-size:11.5px; margin-top:2px; }
+  .btn-mini { background:var(--bg-input); border:1px solid var(--line); border-radius:var(--radius-sm); color:var(--text-soft); font-size:12px; padding:6px 10px; cursor:pointer; font-family:var(--font-body); white-space:nowrap; }
+  .btn-mini:hover { border-color:var(--gold); color:var(--gold); }
+  .del-warn { background:rgba(212,87,78,.1); border:1px solid var(--danger); border-radius:var(--radius-sm); padding:13px 15px; font-size:13px; line-height:1.6; margin-bottom:14px; }
+  .del-warn strong { color:var(--danger); }
+  .bio-status { font-size:13px; line-height:1.7; color:var(--text-soft); background:var(--bg-input); border:1px solid var(--line-soft); border-radius:var(--radius-sm); padding:13px 15px; margin-bottom:14px; }
+  .bio-link-btn {
+    background:transparent; border:none; color:var(--gold); cursor:pointer;
+    font-family:var(--font-body); font-size:14px; margin-top:14px; width:100%;
+    display:flex; align-items:center; justify-content:center; gap:8px;
+  }
+  .bio-link-btn:hover { text-decoration:underline; }
+
   @media (min-width: 768px) {
     .topbar { padding: 18px 32px; }
     .search-bar { padding: 20px 32px 8px; }
-    .stats { padding: 4px 32px 20px; }
-    .contact-list { padding: 0 32px 32px; }
+    .stats { padding: 4px 32px 16px; }
+    .contact-list { padding: 0 32px 100px; }
     .fab { bottom: 32px; right: 32px; }
+    .detail-hero, .detail-body { max-width: 720px; margin-left:auto; margin-right:auto; width:100%; }
+    .tabbar { max-width:720px; margin:0 auto; width:100%; }
   }
 </style>
 </head>
 <body>
 
-<!-- ========== SETUP SCREEN (first run) ========== -->
+<!-- ===== SETUP ===== -->
 <div id="screen-setup" class="screen auth">
   <div class="auth-inner">
     <div class="logo">Cast<span class="vault">Vault</span></div>
     <div class="tagline">Eerste keer — kies je sleutel.</div>
-
     <div class="field-group">
-      <label class="field-label">Master-wachtwoord</label>
+      <label class="field-label" for="setup-pw1">Master-wachtwoord</label>
       <input type="password" id="setup-pw1" class="input-field" placeholder="Minimaal 12 tekens" autocomplete="new-password">
       <div class="strength-meter"><div class="strength-bar" id="strength-bar"></div></div>
       <div class="strength-label" id="strength-label">—</div>
     </div>
     <div class="field-group">
-      <label class="field-label">Bevestig wachtwoord</label>
+      <label class="field-label" for="setup-pw2">Bevestig wachtwoord</label>
       <input type="password" id="setup-pw2" class="input-field" placeholder="Nogmaals" autocomplete="new-password">
     </div>
-
     <button class="btn-primary" id="setup-btn">Vault aanmaken</button>
     <div class="auth-msg" id="setup-msg">Vergeet je dit wachtwoord, dan is je data weg. Voor altijd.</div>
   </div>
 </div>
 
-<!-- ========== LOCK SCREEN ========== -->
+<!-- ===== LOCK ===== -->
 <div id="screen-lock" class="screen auth">
   <div class="auth-inner">
     <div class="logo">Cast<span class="vault">Vault</span></div>
     <div class="tagline">Welkom terug.</div>
-
     <div class="field-group">
-      <label class="field-label">Master-wachtwoord</label>
+      <label class="field-label" for="lock-pw">Master-wachtwoord</label>
       <input type="password" id="lock-pw" class="input-field" placeholder="••••••••••••" autocomplete="current-password">
     </div>
-
     <button class="btn-primary" id="lock-btn">Ontgrendel</button>
+    <button type="button" class="bio-link-btn" id="bio-unlock-btn" style="display:none">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" d="M12 11v4m-4-6a4 4 0 018 0v3a8 8 0 01-1 4m-9-2a12 12 0 01-.3-5 6 6 0 0111.5-1M5 8a8 8 0 0114 0"/></svg>
+      Ontgrendel met Touch ID / Face ID
+    </button>
     <div class="auth-msg" id="lock-msg"></div>
   </div>
 </div>
 
-<!-- ========== MAIN APP ========== -->
+<!-- ===== MAIN ===== -->
 <div id="screen-main" class="screen">
   <div class="topbar">
     <div class="topbar-title">Cast<span class="vault">Vault</span></div>
     <div class="topbar-spacer"></div>
-    <button class="icon-btn" id="btn-import" title="Importeer contacten">
+    <button class="icon-btn btn-filter-mobile" id="btn-filter" title="Filters" aria-label="Filters">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 4h18M6 12h12M10 20h4"/></svg>
+      <span class="badge" id="filter-badge" style="display:none">0</span>
+    </button>
+    <button class="icon-btn" id="btn-auditlog" title="Auditlog (AVG)" aria-label="Auditlog">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path stroke-linecap="round" d="M12 7v5l3 3"/></svg>
+    </button>
+    <button class="icon-btn" id="btn-retentie" title="Bewaartermijn (AVG)" aria-label="Bewaartermijn-signalering">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 3h12M6 21h12M8 3v3a4 4 0 008 0V3M8 21v-3a4 4 0 018 0v3"/></svg>
+      <span class="badge badge-ret" id="retentie-badge" style="display:none">0</span>
+    </button>
+    <button class="icon-btn" id="btn-bio" title="Biometrische ontgrendeling" aria-label="Biometrische ontgrendeling">
+      <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" d="M12 11v4m-4-6a4 4 0 018 0v3a8 8 0 01-1 4m-9-2a12 12 0 01-.3-5 6 6 0 0111.5-1M5 8a8 8 0 0114 0"/></svg>
+    </button>
+    <button class="icon-btn" id="btn-sync" title="Export / import vault" aria-label="Export of import vault">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 8l5-5 5 5M12 3v10M17 16l-5 5-5-5M12 21V11"/></svg>
+    </button>
+    <button class="icon-btn" id="btn-import" title="Importeer contacten" aria-label="Importeer contacten">
       <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3"/></svg>
     </button>
-    <button class="icon-btn" id="btn-lock" title="Vergrendel">
+    <button class="icon-btn" id="btn-lock" title="Vergrendel" aria-label="Vergrendel">
       <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
     </button>
   </div>
 
-  <div class="search-bar">
-    <div class="search-input-wrap">
-      <svg class="search-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="18" height="18"><circle cx="11" cy="11" r="8"/><path stroke-linecap="round" d="m21 21-4.35-4.35"/></svg>
-      <input type="text" class="search-input" id="search" placeholder="Zoek op naam, telefoon, email, tag…" autocomplete="off">
+  <div class="main-body">
+    <aside class="filter-sidebar" id="filter-sidebar"></aside>
+    <div class="main-col">
+      <div class="search-bar">
+        <div class="search-input-wrap">
+          <svg class="search-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="18" height="18"><circle cx="11" cy="11" r="8"/><path stroke-linecap="round" d="m21 21-4.35-4.35"/></svg>
+          <input type="text" class="search-input" id="search" placeholder="Zoek op naam, telefoon, email, tag…" autocomplete="off" aria-label="Zoeken">
+        </div>
+      </div>
+      <div class="stats" id="stats">
+        <span><strong id="stat-count">0</strong> <span id="stat-label">contacten</span></span>
+        <span class="clear-filters" id="clear-filters" style="display:none">Filters wissen</span>
+      </div>
+      <div class="contact-list" id="contact-list"></div>
     </div>
   </div>
 
-  <div class="stats" id="stats">
-    <span><strong id="stat-count">0</strong> contacten</span>
-  </div>
-
-  <div class="contact-list" id="contact-list"></div>
-
-  <button class="fab" id="btn-new" title="Nieuw contact">
+  <button class="fab" id="btn-new" title="Nieuw contact" aria-label="Nieuw contact">
     <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" d="M12 5v14M5 12h14"/></svg>
   </button>
 </div>
 
-<!-- ========== IMPORT MODAL ========== -->
+<!-- ===== DETAIL ===== -->
+<div id="screen-detail" class="screen">
+  <div class="detail-top">
+    <button class="back-btn" id="detail-back">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+      Lijst
+    </button>
+    <div class="topbar-spacer"></div>
+    <button class="icon-btn" id="detail-dossier" title="Dossier exporteren (inzagerecht)" aria-label="Dossier exporteren">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6M9 8h2m8-3v14a2 2 0 01-2 2H7a2 2 0 01-2-2V5a2 2 0 012-2h7l5 5z"/></svg>
+    </button>
+    <button class="icon-btn" id="detail-delete" title="Verwijder contact (vergeetrecht)" aria-label="Verwijder contact">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 6h18M8 6V4a1 1 0 011-1h6a1 1 0 011 1v2m2 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6"/></svg>
+    </button>
+  </div>
+  <div class="detail-hero">
+    <div class="avatar avatar-lg" id="detail-avatar">?</div>
+    <div class="detail-hero-meta">
+      <div class="detail-hero-name" id="detail-name">—</div>
+      <div class="detail-hero-sub" id="detail-sub"></div>
+      <div class="detail-hero-tags" id="detail-tags"></div>
+    </div>
+  </div>
+  <div class="tabbar" id="tabbar"></div>
+  <div class="detail-body" id="detail-body"></div>
+</div>
+
+<!-- ===== IMPORT MODAL ===== -->
 <div class="modal-backdrop" id="modal-import">
   <div class="modal">
     <div class="modal-handle"></div>
     <div class="modal-title">Contacten importeren</div>
     <div class="modal-subtitle">vCard (.vcf) bestand van iPhone of iCloud</div>
-
     <div class="file-drop" id="file-drop">
       <div class="file-drop-text">Tik om bestand te kiezen</div>
       <div class="file-drop-hint">of sleep een .vcf bestand hierheen</div>
       <input type="file" id="file-input" accept=".vcf,text/vcard,text/x-vcard" style="display:none">
     </div>
-
     <div style="background: var(--bg-input); border-radius: var(--radius-sm); padding: 14px 16px; font-size: 12px; color: var(--text-dim); line-height: 1.6; margin-bottom: 16px;">
       <strong style="color: var(--gold); display: block; margin-bottom: 6px;">Hoe exporteer je vanaf iPhone?</strong>
       iCloud.com → Contacten → selecteer alles (Cmd/Ctrl + A) → tandwiel → Exporteer vCard.
     </div>
-
     <button class="btn-primary btn-secondary" onclick="closeModal('modal-import')">Sluiten</button>
   </div>
 </div>
 
-<!-- ========== TOAST ========== -->
+<!-- ===== REVIEW MODAL (bio / tv import — mens beslist) ===== -->
+<div class="modal-backdrop" id="modal-review">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="review-title">Review</div>
+    <div class="modal-subtitle" id="review-sub"></div>
+    <div id="review-body"></div>
+  </div>
+</div>
+
+<!-- ===== SYNC MODAL (encrypted export / import) ===== -->
+<div class="modal-backdrop" id="modal-sync">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Export &amp; import</div>
+    <div class="modal-subtitle">Eén versleuteld .castvault-bestand — ook de basis voor overdracht naar een andere Mac.</div>
+    <div class="section-sub" style="margin-top:0">Exporteren</div>
+    <div class="edit-field"><label for="exp-pw1">Wachtwoord voor dit bestand (min. 12 tekens)</label><input type="password" id="exp-pw1" autocomplete="new-password"></div>
+    <div class="edit-field"><label for="exp-pw2">Bevestig wachtwoord</label><input type="password" id="exp-pw2" autocomplete="new-password"></div>
+    <button class="btn-primary" id="btn-export" style="margin-top:4px">Exporteer vault</button>
+    <div class="section-sub">Importeren</div>
+    <div class="edit-field"><label for="imp-file">.castvault-bestand</label><input type="file" id="imp-file" accept=".castvault,application/json"></div>
+    <div class="edit-field"><label for="imp-pw">Wachtwoord van het bestand</label><input type="password" id="imp-pw" autocomplete="off"></div>
+    <div class="imp-mode">
+      <label><input type="radio" name="impmode" value="merge" checked> Samenvoegen — nieuwste versie per contact wint</label>
+      <label><input type="radio" name="impmode" value="replace"> Vervangen — wist eerst de huidige vault</label>
+    </div>
+    <button class="btn-primary" id="btn-import-cv">Importeer</button>
+    <div class="auth-msg" id="sync-msg"></div>
+    <button class="btn-primary btn-secondary" onclick="closeModal('modal-sync')">Sluiten</button>
+  </div>
+</div>
+
+<!-- ===== v0.4: FOTO MODAL ===== -->
+<div class="modal-backdrop" id="modal-foto">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Foto</div>
+    <div class="modal-subtitle">Gecomprimeerd tot ±200KB · versleuteld opgeslagen · gaat mee in de export</div>
+    <div class="foto-preview" id="foto-preview"></div>
+    <input type="file" id="foto-input" accept="image/*" style="display:none">
+    <button class="btn-primary" id="btn-foto-pick">Foto kiezen…</button>
+    <button class="btn-primary btn-danger" id="btn-foto-del" style="display:none">Foto verwijderen</button>
+    <button class="btn-primary btn-secondary" onclick="closeModal('modal-foto')">Sluiten</button>
+  </div>
+</div>
+
+<!-- ===== v0.4: DOSSIER EXPORT (inzagerecht) ===== -->
+<div class="modal-backdrop" id="modal-dossier">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Dossier exporteren</div>
+    <div class="modal-subtitle">AVG-inzagerecht (art. 15): alles wat over deze persoon is vastgelegd, incl. bronnen en wijzigingshistorie.</div>
+    <button class="btn-primary" id="btn-dossier-html">Leesbaar dossier (HTML — print naar PDF)</button>
+    <button class="btn-primary btn-secondary" id="btn-dossier-json">Machineleesbaar (JSON)</button>
+    <div class="placeholder-note" style="margin-top:14px">Let op: het geëxporteerde bestand is <strong>niet versleuteld</strong> — dat is het punt van inzagerecht. Bewaar of verstuur het bewust.</div>
+    <button class="btn-primary btn-secondary" onclick="closeModal('modal-dossier')">Annuleer</button>
+  </div>
+</div>
+
+<!-- ===== v0.5: BEWAARTERMIJN (AVG retentie-signalering) ===== -->
+<div class="modal-backdrop" id="modal-retentie">
+  <div class="modal" style="max-width:560px">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Bewaartermijn</div>
+    <div class="modal-subtitle">AVG-opslagbeperking (art. 5): contacten zonder gedocumenteerde activiteit binnen de termijn. Beoordeel per contact: bewaren (vastgelegd in de auditlog) of verwijderen (vergeetrecht via het contact zelf).</div>
+    <div class="ret-setting">
+      <label for="ret-maanden">Signaleren na</label>
+      <input type="number" id="ret-maanden" min="6" max="120" step="1" aria-label="Bewaartermijn in maanden">
+      <span>maanden zonder activiteit</span>
+    </div>
+    <div class="al-count" id="ret-count"></div>
+    <div class="al-rows" id="ret-rows" style="max-height:40vh"></div>
+    <div class="placeholder-note" style="margin-top:14px">"Activiteit" = een wijziging, import, dossier-export of een eerdere bewaar-beoordeling. Alleen een contact bekijken telt bewust niet mee.</div>
+    <button class="btn-primary btn-secondary" onclick="closeModal('modal-retentie')">Sluiten</button>
+  </div>
+</div>
+
+<!-- ===== v0.4: GLOBALE AUDITLOG ===== -->
+<div class="modal-backdrop" id="modal-auditlog">
+  <div class="modal" style="max-width:640px">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Auditlog</div>
+    <div class="modal-subtitle">Alle wijzigingen, over alle contacten — plus het (geanonimiseerde) verwijderlog.</div>
+    <div class="al-filters">
+      <select id="al-contact" aria-label="Filter op contact"></select>
+      <select id="al-actie" aria-label="Filter op actie"></select>
+      <input type="date" id="al-van" aria-label="Vanaf datum">
+      <input type="date" id="al-tot" aria-label="Tot en met datum">
+      <input type="text" id="al-zoek" class="full" placeholder="Zoek in log…" autocomplete="off" aria-label="Zoeken in log">
+    </div>
+    <div class="al-count" id="al-count"></div>
+    <div class="al-rows" id="al-rows"></div>
+    <div class="edit-actions" style="position:static;background:none">
+      <button class="btn-primary btn-secondary" id="al-wis" style="flex:1">Filters wissen</button>
+      <button class="btn-primary" id="al-csv" style="flex:1">Exporteer CSV</button>
+    </div>
+    <button class="btn-primary btn-secondary" onclick="closeModal('modal-auditlog')">Sluiten</button>
+  </div>
+</div>
+
+<!-- ===== v0.4: VERGEETRECHT (delete met bevestiging) ===== -->
+<div class="modal-backdrop" id="modal-delete">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Definitief verwijderen</div>
+    <div class="modal-subtitle">Vergeetrecht (AVG art. 17)</div>
+    <div class="del-warn"><strong>Dit kan niet ongedaan worden gemaakt.</strong> Alle gegevens van <strong id="del-naam">—</strong> worden definitief gewist: profiel, foto, red flags, notities en de volledige wijzigingshistorie. Er blijft alleen een <em>geanonimiseerde</em> log-regel achter (datum + reden, zonder naam), zodat aantoonbaar is dát er iets verwijderd is.</div>
+    <div class="edit-field"><label for="del-reden">Reden *</label><select id="del-reden"></select></div>
+    <div class="edit-field"><label for="del-bevestig">Typ de volledige naam om te bevestigen *</label><input type="text" id="del-bevestig" autocomplete="off"></div>
+    <button class="btn-primary btn-danger" id="btn-del-def">Definitief verwijderen</button>
+    <div class="auth-msg" id="del-msg"></div>
+    <button class="btn-primary btn-secondary" onclick="closeModal('modal-delete')">Annuleer</button>
+  </div>
+</div>
+
+<!-- ===== v0.4: BIOMETRIE ===== -->
+<div class="modal-backdrop" id="modal-bio">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Face ID / Touch ID</div>
+    <div class="modal-subtitle">Ontgrendel de vault met biometrie. Je master-wachtwoord blijft altijd werken.</div>
+    <div class="bio-status" id="bio-status"></div>
+    <div id="bio-enable-block">
+      <div class="edit-field"><label for="bio-pw">Master-wachtwoord (ter bevestiging)</label><input type="password" id="bio-pw" autocomplete="current-password"></div>
+      <button class="btn-primary" id="btn-bio-aan">Inschakelen</button>
+    </div>
+    <button class="btn-primary btn-danger" id="btn-bio-uit" style="display:none">Uitschakelen</button>
+    <div class="auth-msg" id="bio-msg"></div>
+    <button class="btn-primary btn-secondary" onclick="closeModal('modal-bio')">Sluiten</button>
+  </div>
+</div>
+
+<!-- ===== FILTER SHEET (mobile) ===== -->
+<div class="modal-backdrop" id="modal-filter">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div id="filter-sheet-body"></div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script src="app.js"></script>
