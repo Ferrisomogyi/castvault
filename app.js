@@ -1,5 +1,5 @@
 /* ============================================================
-   CastVault v0.5
+   CastVault v0.5.1
    Chat 1 (v0.1): crypto, IndexedDB, vCard import, fuzzy search.
    Chat 2 (v0.2): detail-scherm + tabs, edit-modus per tab,
                   handmatig nieuw contact, tags + autocomplete,
@@ -404,7 +404,11 @@ function toast(msg, type = '') {
   t.textContent = msg; t.className = 'toast show ' + type;
   setTimeout(() => t.classList.remove('show'), 3000);
 }
-function openModal(id) { document.getElementById(id).classList.add('active'); }
+function openModal(id) {
+  /* v0.5.1: nooit twee modals tegelijk — voorkomt 'sluiten doet niets'-verwarring */
+  document.querySelectorAll('.modal-backdrop.active').forEach(b => { if (b.id !== id) b.classList.remove('active'); });
+  document.getElementById(id).classList.add('active');
+}
 function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 window.openModal = openModal; window.closeModal = closeModal;
 
@@ -2107,6 +2111,17 @@ function wireBioModal() {
   });
 }
 wireBioModal();
+
+/* v0.5.1: modals sluiten via backdrop-klik en Escape (UX-fix uit live test) */
+document.querySelectorAll('.modal-backdrop').forEach(bd => {
+  bd.addEventListener('click', e => { if (e.target === bd) bd.classList.remove('active'); });
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    const open = Array.from(document.querySelectorAll('.modal-backdrop.active')).pop();
+    if (open) open.classList.remove('active');
+  }
+});
 
 (async function init() {
   if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});

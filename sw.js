@@ -1,5 +1,5 @@
 /* CastVault Service Worker — offline-first cache */
-const CACHE = 'castvault-v0.5';
+const CACHE = 'castvault-v0.5-1';
 const ASSETS = [
   './',
   './index.html',
