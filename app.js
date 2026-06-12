@@ -1,5 +1,7 @@
 /* ============================================================
-   CastVault v0.6
+   CastVault v0.6.1
+   v0.6.1: CSP-fix — inline onclick/oninput vervangen door gedelegeerde
+   listeners (Sluiten-knoppen in alle modals werkten niet op de live site).
    Chat 6 (v0.6): Wikipedia-zoekfix (zoek-API-fallback, hoofdletter-
    ongevoelig) + anti-hallucinatie bio (waarschuwing in review-modal,
    geboortejaar-context naar Worker; prompt-verharding zit in worker.js).
@@ -434,7 +436,7 @@ function renderContacts() {
         <div class="empty-state-icon">∅</div>
         <div class="empty-state-title">Lege vault</div>
         <div class="empty-state-text">Importeer je iPhone-contacten om te beginnen.<br>Of voeg er één met de hand toe (+).</div>
-        <button class="btn-primary" style="max-width:240px;margin:0 auto;" onclick="openModal('modal-import')">Importeer .vcf</button>
+        <button class="btn-primary" style="max-width:240px;margin:0 auto;" data-open-modal="modal-import">Importeer .vcf</button>
       </div>`;
     return;
   }
@@ -658,8 +660,7 @@ function editScalar(f, c) {
   if (f.t === 'slider') {
     const val = v || 0;
     return `<div class="slider-field"><div class="slider-top"><label for="${id}">${escapeHtml(f.l)}</label><span class="slider-val" id="${id}-val">${val ? val + '/5' : '—'}</span></div>
-      <input type="range" id="${id}" min="0" max="5" step="1" value="${val}"
-        oninput="document.getElementById('${id}-val').textContent=this.value==='0'?'—':this.value+'/5'"></div>`;
+      <input type="range" id="${id}" min="0" max="5" step="1" value="${val}" data-slider></div>`;
   }
   let field;
   if (f.t === 'select') field = `<select id="${id}">${f.o.map(o => `<option value="${escapeHtml(o)}" ${String(v||'')===o?'selected':''}>${o===''?'— kies —':escapeHtml(o)}</option>`).join('')}</select>`;
@@ -1083,7 +1084,7 @@ function renderFilterPanel() {
   const ctypes = uniqueScalar('castingType');
   const chipSet = (arr, set2, attr) => arr.length ? arr.map(v => `<div class="chip-opt ${set2.has(v)?'sel':''}" data-${attr}="${escapeHtml(v)}">${escapeHtml(v)}</div>`).join('') : '<span style="color:var(--text-dim);font-size:13px">— nog geen data —</span>';
   const slider = (key, label) => `<div class="slider-field"><div class="slider-top"><span>${label}</span><span class="slider-val" id="flt-${key}-val">${f[key]?'≥ '+f[key]:'alle'}</span></div>
-    <input type="range" min="0" max="5" step="1" value="${f[key]}" data-flt-slider="${key}" oninput="document.getElementById('flt-${key}-val').textContent=this.value==='0'?'alle':'≥ '+this.value"></div>`;
+    <input type="range" min="0" max="5" step="1" value="${f[key]}" data-flt-slider="${key}"></div>`;
   return `
     <div class="filter-head"><h3>Filters</h3></div>
     <div class="filter-block"><div class="fb-label">Leeftijd</div>
@@ -1230,7 +1231,7 @@ function showBioReview(res) {
     <div class="edit-field"><label for="review-bio-text">Tekst (nog aanpasbaar)</label>
     <textarea id="review-bio-text" style="min-height:150px">${escapeHtml(res.tekst)}</textarea></div>
     <div class="edit-actions" style="position:static;background:none">
-      <button class="btn-primary btn-secondary" onclick="closeModal('modal-review')" style="flex:1">Annuleer</button>
+      <button class="btn-primary btn-secondary" data-close-modal="modal-review" style="flex:1">Annuleer</button>
       <button class="btn-primary" id="review-bio-save" style="flex:1">Opslaan</button>
     </div>`;
   document.getElementById('review-bio-save').addEventListener('click', async () => {
@@ -1254,7 +1255,7 @@ function showBioNotFound(naam) {
   document.getElementById('review-body').innerHTML = `
     <div class="placeholder-note">Geen (bruikbaar) Wikipedia-artikel gevonden voor "${escapeHtml(naam)}". Je kunt Claude een concept-bio laten schrijven via je eigen Worker. Die is dan <strong>AI-gegenereerd en ongeverifieerd</strong> — altijd zelf checken vóór gebruik.</div>
     <div class="edit-actions" style="position:static;background:none">
-      <button class="btn-primary btn-secondary" onclick="closeModal('modal-review')" style="flex:1">Annuleer</button>
+      <button class="btn-primary btn-secondary" data-close-modal="modal-review" style="flex:1">Annuleer</button>
       <button class="btn-primary" id="review-bio-ai" style="flex:1">Probeer AI-bio</button>
     </div>`;
   document.getElementById('review-bio-ai').addEventListener('click', async () => {
@@ -1327,7 +1328,7 @@ function showTvReview(items, opmerking) {
     <div class="placeholder-note" style="margin-bottom:14px">Dit is <strong>AI-output — ongeverifieerd</strong>. Vink aan wat je wil bewaren. Elk item houdt het label "AI — ongeverifieerd" tot jij het in de carrière-tab afvinkt.${opmerking ? '<br><em>Claude: ' + escapeHtml(opmerking) + '</em>' : ''}</div>
     <div class="review-list">${rows}</div>
     <div class="edit-actions" style="position:static;background:none">
-      <button class="btn-primary btn-secondary" onclick="closeModal('modal-review')" style="flex:1">Annuleer</button>
+      <button class="btn-primary btn-secondary" data-close-modal="modal-review" style="flex:1">Annuleer</button>
       <button class="btn-primary" id="review-tv-save" style="flex:1">Geselecteerde opslaan</button>
     </div>`;
   document.getElementById('review-tv-save').addEventListener('click', async () => {
@@ -2149,6 +2150,27 @@ function wireBioModal() {
   });
 }
 wireBioModal();
+
+/* v0.6.1: CSP blokkeert inline handlers (onclick/oninput) — daarom waren de
+   Sluiten/Annuleer-knoppen dood op de live site (jsdom-tests dwingen geen CSP
+   af, dus headless bleef alles groen). Fix: data-attributen + gedelegeerde
+   listeners. Geen inline JS meer in de hele app. */
+document.addEventListener('click', e => {
+  const c = e.target.closest('[data-close-modal]');
+  if (c) { closeModal(c.dataset.closeModal); return; }
+  const o = e.target.closest('[data-open-modal]');
+  if (o) openModal(o.dataset.openModal);
+});
+document.addEventListener('input', e => {
+  if (e.target.matches && e.target.matches('input[type="range"][data-slider]')) {
+    const lbl = document.getElementById(e.target.id + '-val');
+    if (lbl) lbl.textContent = e.target.value === '0' ? '—' : e.target.value + '/5';
+  }
+  if (e.target.matches && e.target.matches('input[type="range"][data-flt-slider]')) {
+    const lbl = document.getElementById('flt-' + e.target.dataset.fltSlider + '-val');
+    if (lbl) lbl.textContent = e.target.value === '0' ? 'alle' : '≥ ' + e.target.value;
+  }
+});
 
 /* v0.5.1: modals sluiten via backdrop-klik en Escape (UX-fix uit live test) */
 document.querySelectorAll('.modal-backdrop').forEach(bd => {

@@ -762,7 +762,7 @@
       <strong style="color: var(--gold); display: block; margin-bottom: 6px;">Hoe exporteer je vanaf iPhone?</strong>
       iCloud.com → Contacten → selecteer alles (Cmd/Ctrl + A) → tandwiel → Exporteer vCard.
     </div>
-    <button class="btn-primary btn-secondary" onclick="closeModal('modal-import')">Sluiten</button>
+    <button class="btn-primary btn-secondary" data-close-modal="modal-import">Sluiten</button>
   </div>
 </div>
 
@@ -795,7 +795,7 @@
     </div>
     <button class="btn-primary" id="btn-import-cv">Importeer</button>
     <div class="auth-msg" id="sync-msg"></div>
-    <button class="btn-primary btn-secondary" onclick="closeModal('modal-sync')">Sluiten</button>
+    <button class="btn-primary btn-secondary" data-close-modal="modal-sync">Sluiten</button>
   </div>
 </div>
 
@@ -809,7 +809,7 @@
     <input type="file" id="foto-input" accept="image/*" style="display:none">
     <button class="btn-primary" id="btn-foto-pick">Foto kiezen…</button>
     <button class="btn-primary btn-danger" id="btn-foto-del" style="display:none">Foto verwijderen</button>
-    <button class="btn-primary btn-secondary" onclick="closeModal('modal-foto')">Sluiten</button>
+    <button class="btn-primary btn-secondary" data-close-modal="modal-foto">Sluiten</button>
   </div>
 </div>
 
@@ -822,7 +822,7 @@
     <button class="btn-primary" id="btn-dossier-html">Leesbaar dossier (HTML — print naar PDF)</button>
     <button class="btn-primary btn-secondary" id="btn-dossier-json">Machineleesbaar (JSON)</button>
     <div class="placeholder-note" style="margin-top:14px">Let op: het geëxporteerde bestand is <strong>niet versleuteld</strong> — dat is het punt van inzagerecht. Bewaar of verstuur het bewust.</div>
-    <button class="btn-primary btn-secondary" onclick="closeModal('modal-dossier')">Annuleer</button>
+    <button class="btn-primary btn-secondary" data-close-modal="modal-dossier">Annuleer</button>
   </div>
 </div>
 
@@ -840,7 +840,7 @@
     <div class="al-count" id="ret-count"></div>
     <div class="al-rows" id="ret-rows" style="max-height:40vh"></div>
     <div class="placeholder-note" style="margin-top:14px">"Activiteit" = een wijziging, import, dossier-export of een eerdere bewaar-beoordeling. Alleen een contact bekijken telt bewust niet mee.</div>
-    <button class="btn-primary btn-secondary" onclick="closeModal('modal-retentie')">Sluiten</button>
+    <button class="btn-primary btn-secondary" data-close-modal="modal-retentie">Sluiten</button>
   </div>
 </div>
 
@@ -863,7 +863,7 @@
       <button class="btn-primary btn-secondary" id="al-wis" style="flex:1">Filters wissen</button>
       <button class="btn-primary" id="al-csv" style="flex:1">Exporteer CSV</button>
     </div>
-    <button class="btn-primary btn-secondary" onclick="closeModal('modal-auditlog')">Sluiten</button>
+    <button class="btn-primary btn-secondary" data-close-modal="modal-auditlog">Sluiten</button>
   </div>
 </div>
 
@@ -878,7 +878,7 @@
     <div class="edit-field"><label for="del-bevestig">Typ de volledige naam om te bevestigen *</label><input type="text" id="del-bevestig" autocomplete="off"></div>
     <button class="btn-primary btn-danger" id="btn-del-def">Definitief verwijderen</button>
     <div class="auth-msg" id="del-msg"></div>
-    <button class="btn-primary btn-secondary" onclick="closeModal('modal-delete')">Annuleer</button>
+    <button class="btn-primary btn-secondary" data-close-modal="modal-delete">Annuleer</button>
   </div>
 </div>
 
@@ -895,7 +895,7 @@
     </div>
     <button class="btn-primary btn-danger" id="btn-bio-uit" style="display:none">Uitschakelen</button>
     <div class="auth-msg" id="bio-msg"></div>
-    <button class="btn-primary btn-secondary" onclick="closeModal('modal-bio')">Sluiten</button>
+    <button class="btn-primary btn-secondary" data-close-modal="modal-bio">Sluiten</button>
   </div>
 </div>
 

@@ -30,6 +30,10 @@ t('v0.6: bio-call stuurt geboortejaar mee', /callWorker\('bio', naam, \{ geboort
 t('v0.6: worker bio-prompt verhard (verzin-nooit-regels)', workerJs.includes('Verzin NOOIT') && workerJs.includes('onbekend'));
 t('v0.6: worker temperature 0', /temperature: 0/.test(workerJs));
 t('v0.6: worker bioPrompt accepteert geboortejaar', /bioPrompt\(naam, geboortejaar\)/.test(workerJs));
+t('v0.6.1: geen inline onclick meer (CSP blokkeert die op de live site)', !/onclick=/.test(html) && !/onclick=/.test(appJs));
+t('v0.6.1: geen inline oninput meer', !/oninput=/.test(html) && !/oninput=/.test(appJs));
+t('v0.6.1: gedelegeerde data-close-modal listener aanwezig', appJs.includes("closest('[data-close-modal]')") && appJs.includes("closest('[data-open-modal]')"));
+t('v0.6.1: gedelegeerde slider-listener aanwezig', appJs.includes('data-slider') && appJs.includes('data-flt-slider'));
 const ids = ['modal-foto','foto-preview','foto-input','btn-foto-pick','btn-foto-del',
   'modal-dossier','btn-dossier-html','btn-dossier-json','detail-dossier',
   'modal-auditlog','btn-auditlog','al-contact','al-actie','al-van','al-tot','al-zoek','al-rows','al-count','al-csv','al-wis',
@@ -276,6 +280,17 @@ t('v0.5.3: zoeken op (deel van) nummer werkt nog wel', E(`searchContacts('061234
 t('blankContact heeft v0.4-velden', E(`'foto' in blankContact() && 'fotoToegevoegd' in blankContact()`));
 t('vergrendelen wist ook verwijderlog uit geheugen', (() => { E(`lockVault()`); return E(`state.deletions.length`) === 0 && E(`state.key`) === null; })());
 t('vergrendelen reset settings naar default', E(`state.settings.bewaartermijnMaanden`) === 24);
+
+
+/* ========== 11. v0.6.1: MODAL-SLUITKNOPPEN (CSP-fix) ========== */
+section('v0.6.1 modal-sluitknoppen');
+E(`openModal('modal-retentie')`);
+t('modal-retentie open', w.document.getElementById('modal-retentie').classList.contains('active'));
+(() => { const btn = w.document.querySelector('#modal-retentie [data-close-modal]'); btn.dispatchEvent(new w.Event('click', { bubbles: true })); })();
+t('Sluiten-knop sluit de modal (gedelegeerde listener, geen inline JS)', !w.document.getElementById('modal-retentie').classList.contains('active'));
+E(`openModal('modal-bio')`);
+(() => { const btn = w.document.querySelector('#modal-bio [data-close-modal]'); btn.dispatchEvent(new w.Event('click', { bubbles: true })); })();
+t('ook modal-bio sluit via de knop', !w.document.getElementById('modal-bio').classList.contains('active'));
 
 console.log(`\n========================================\nRESULTAAT: ${pass}/${pass + fail} groen${fail ? ` — ${fail} GEFAALD` : ' — alles groen ✓'}\n========================================`);
 process.exit(fail ? 1 : 0);
