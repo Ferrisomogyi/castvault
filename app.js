@@ -1,5 +1,5 @@
 /* ============================================================
-   CastVault v0.5.2
+   CastVault v0.5.3
    Chat 1 (v0.1): crypto, IndexedDB, vCard import, fuzzy search.
    Chat 2 (v0.2): detail-scherm + tabs, edit-modus per tab,
                   handmatig nieuw contact, tags + autocomplete,
@@ -361,7 +361,8 @@ function searchContacts(query) {
     let score = 0;
     const naam = (c.naam || '').toLowerCase();
     if (naam === q) score += 100; else if (naam.startsWith(q)) score += 50; else if (naam.includes(q)) score += 20;
-    for (const t of c.telefoon || []) if (t.nummer.includes(q.replace(/[^\d+]/g, ''))) score += 15;
+    const qNum = q.replace(/[^\d+]/g, ''); // v0.5.3: lege nummer-query matchte ALLES (bug: ''.includes geeft altijd true)
+    if (qNum.length >= 2) for (const t of c.telefoon || []) if (t.nummer.includes(qNum)) score += 15;
     for (const e of c.email || []) if ((e.adres || '').toLowerCase().includes(q)) score += 15;
     for (const tag of c.tags || []) if (tag.toLowerCase().includes(q)) score += 10;
     if ((c.bio || '').toLowerCase().includes(q)) score += 5;
