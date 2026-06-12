@@ -1,5 +1,8 @@
 /* ============================================================
-   CastVault v0.5.3
+   CastVault v0.6
+   Chat 6 (v0.6): Wikipedia-zoekfix (zoek-API-fallback, hoofdletter-
+   ongevoelig) + anti-hallucinatie bio (waarschuwing in review-modal,
+   geboortejaar-context naar Worker; prompt-verharding zit in worker.js).
    Chat 1 (v0.1): crypto, IndexedDB, vCard import, fuzzy search.
    Chat 2 (v0.2): detail-scherm + tabs, edit-modus per tab,
                   handmatig nieuw contact, tags + autocomplete,
@@ -1158,19 +1161,49 @@ function importNaamCheck() {
 }
 
 /* ----- Wikipedia ----- */
+/* v0.6: summary-endpoint vereist een EXACTE paginatitel. "ferri somogyi"
+   werd "Ferri_somogyi" (Wikipedia kapitaliseert alleen de 1e letter) en
+   bestond dus niet, terwijl "Ferri Somogyi" wél bestaat. Fix: vind eerst
+   de echte titel via de zoek-API (hoofdletter-ongevoelig), dan summary. */
+async function wikiSummary(lang, titel) {
+  const r = await fetch(`https://${lang}.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(titel.replace(/ /g, '_'))}`);
+  if (!r.ok) return null;
+  const j = await r.json();
+  if (j.type === 'disambiguation') return null; // ambigu — geen gok doen
+  if (!j.extract || !j.extract.trim()) return null;
+  return {
+    tekst: j.extract.trim(),
+    bron: `Wikipedia (${lang.toUpperCase()}) — artikel "${j.title || titel}"`,
+    url: (j.content_urls && j.content_urls.desktop && j.content_urls.desktop.page) || '',
+  };
+}
+async function wikiZoekTitel(lang, naam) {
+  /* Zoek-API is hoofdletter-ongevoelig en tikfout-tolerant. origin=* is
+     nodig voor CORS; host valt binnen de bestaande CSP connect-src. */
+  const u = `https://${lang}.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(naam)}&srlimit=5&srnamespace=0&format=json&origin=*`;
+  const r = await fetch(u);
+  if (!r.ok) return null;
+  const j = await r.json();
+  const hits = (j.query && j.query.search) || [];
+  if (!hits.length) return null;
+  /* Voorkeur: titel die (zonder hoofdletters) gelijk is aan de zoeknaam;
+     anders de beste zoektreffer. De menselijke review blijft de poortwachter. */
+  const naamLc = naam.toLowerCase();
+  const exact = hits.find(h => (h.title || '').toLowerCase() === naamLc);
+  return (exact || hits[0]).title || null;
+}
 async function fetchBioWikipedia(naam) {
   for (const lang of ['nl', 'en']) {
     try {
-      const r = await fetch(`https://${lang}.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(naam.replace(/ /g, '_'))}`);
-      if (!r.ok) continue;
-      const j = await r.json();
-      if (j.type === 'disambiguation') continue; // ambigu — geen gok doen
-      if (j.extract && j.extract.trim()) {
-        return {
-          tekst: j.extract.trim(),
-          bron: `Wikipedia (${lang.toUpperCase()})`,
-          url: (j.content_urls && j.content_urls.desktop && j.content_urls.desktop.page) || '',
-        };
+      const direct = await wikiSummary(lang, naam);
+      if (direct) return direct;
+      const titel = await wikiZoekTitel(lang, naam);
+      /* Exacte (hoofdlettergevoelige) vergelijking: "ferri somogyi" vs
+         gevonden titel "Ferri Somogyi" verschilt — en moet dus opnieuw
+         worden opgehaald. Alleen 100% identiek = al geprobeerd. */
+      if (titel && titel !== naam) {
+        const viaZoek = await wikiSummary(lang, titel);
+        if (viaZoek) return viaZoek;
       }
     } catch (e) { /* offline of geblokkeerd — probeer volgende taal */ }
   }
@@ -1187,7 +1220,9 @@ async function startBioImport() {
 
 function showBioReview(res) {
   const c = currentContact();
-  const overwrite = c.bio ? `<div class="review-warn">Let op: opslaan overschrijft de huidige bio.</div>` : '';
+  let overwrite = c.bio ? `<div class="review-warn">Let op: opslaan overschrijft de huidige bio.</div>` : '';
+  /* v0.6: AI-tekst kan feiten verzinnen of personen verwisselen — hard waarschuwen */
+  if ((res.bron || '').startsWith('AI')) overwrite = `<div class="review-warn">⚠ AI-tekst: kan fouten bevatten of de verkeerde persoon beschrijven. Controleer élk feit vóór opslaan — of pas de tekst hieronder aan.</div>` + overwrite;
   document.getElementById('review-title').textContent = 'Bio — review vóór opslaan';
   document.getElementById('review-sub').textContent = res.bron + (res.url ? ' · ' + res.url : '');
   document.getElementById('review-body').innerHTML = `
@@ -1225,7 +1260,9 @@ function showBioNotFound(naam) {
   document.getElementById('review-bio-ai').addEventListener('click', async () => {
     document.getElementById('review-body').innerHTML = `<div class="empty-inline">Claude schrijft een concept-bio…</div>`;
     try {
-      const j = await callWorker('bio', naam);
+      /* v0.6: geboortejaar mee als context — voorkomt verwisseling met naamgenoten */
+      const cBio = currentContact();
+      const j = await callWorker('bio', naam, { geboortejaar: ((cBio && cBio.geboortedatum) || '').slice(0, 4) || undefined });
       if (!j || j.onbekend || !j.bio) {
         document.getElementById('review-body').innerHTML = `<div class="placeholder-note">Claude kent deze persoon niet met genoeg zekerheid. Geen bio gegenereerd — beter géén data dan verzonnen data.</div>`;
         return;
